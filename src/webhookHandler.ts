@@ -40,10 +40,6 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
   }
 
   // 4. Find next unpaid installment — scoped to THIS borrower's loans only.
-  // Previously this queried installments globally with no borrower filter,
-  // which meant a payment from Borrower A could get matched against
-  // Borrower B's installment the moment more than one borrower had a
-  // pending installment. loans!inner(borrower_id) filters via the join.
   const { data: nextInstallment } = await supabase
     .from("installments")
     .select(
@@ -60,7 +56,13 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
   }
 
   // 5. Compare amounts (in naira)
-  const amountReceived = parseFloat(payload.data.transaction.amount || "0");
+  // Nomba's real payload field is `transactionAmount`, not `amount` — the
+  // old field name meant every real payment resolved to ₦0 and got
+  // routed into disputes regardless of the actual amount sent.
+  // `??` (not `||`) so a genuine 0 doesn't get masked, only null/undefined.
+  const amountReceived = parseFloat(
+    String(payload.data.transaction.transactionAmount ?? "0"),
+  );
   const amountDue = parseFloat(nextInstallment.amount_due);
 
   // 6. Log payment
