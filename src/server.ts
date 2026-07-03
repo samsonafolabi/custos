@@ -50,7 +50,7 @@ app.use((req: Request, res: Response, next) => {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 // ... keep all your other routes exactly the same ...
 
@@ -96,6 +96,6 @@ app.post("/webhooks/nomba", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
