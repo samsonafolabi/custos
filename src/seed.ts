@@ -4,7 +4,7 @@ async function seed() {
   // Create lender
   const { data: lender } = await supabase
     .from("lenders")
-    .insert({ name: "Demo Microfinance", nomba_account_id: "demo-account-1" })
+    .insert({ name: "Seed Microfinance", nomba_account_id: "demo-account-1" })
     .select()
     .single();
 

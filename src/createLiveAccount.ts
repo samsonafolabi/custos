@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 async function getLiveToken() {
-  const accountId = process.env.NOMBA_MAIN_ACCOUNT_ID; // your one general account ID
+  const accountId = process.env.NOMBA_MAIN_ACCOUNT_ID;
   const clientId = process.env.NOMBA_LIVE_CLIENT_ID;
   const privateKey = process.env.NOMBA_LIVE_PRIVATE_KEY;
 
@@ -35,7 +35,7 @@ async function createLiveVirtualAccount(
 ) {
   const token = await getLiveToken();
   const accountId = process.env.NOMBA_MAIN_ACCOUNT_ID;
-  const subAccountId = process.env.NOMBA_SUB_ACCOUNT_ID; // your sub-account ID
+  const subAccountId = process.env.NOMBA_SUB_ACCOUNT_ID;
 
   if (!subAccountId) {
     throw new Error(
@@ -49,9 +49,6 @@ async function createLiveVirtualAccount(
     currency: "NGN",
   };
 
-  // subAccountId goes in the URL path, not the body or headers —
-  // per Nomba's dev community, webhooks don't attach to the account
-  // unless it's provisioned this way.
   const res = await fetch(
     `https://api.nomba.com/v1/accounts/virtual/${subAccountId}`,
     {
@@ -77,7 +74,12 @@ async function createLiveVirtualAccount(
   }
 }
 
-async function saveToDb(accountRef: string, accountData: any) {
+async function saveToDb(
+  accountRef: string,
+  accountName: string, // ← use the name YOU sent, not what Nomba returns
+  phone: string, // ← pass real phone instead of hardcoding
+  accountData: any,
+) {
   const { data: lender } = await supabase
     .from("lenders")
     .select("id")
@@ -89,15 +91,22 @@ async function saveToDb(accountRef: string, accountData: any) {
     return;
   }
 
+  // Safety: if Nomba mutates the name, strip common prefixes, but prefer the original
+  const cleanName =
+    accountName
+      .replace(/^Nomba\s*/i, "") // strips "Nomba " or "Nomba/" at start
+      .replace(/^Hackathon\s*/i, "")
+      .trim() || accountName;
+
   const { data: borrower, error } = await supabase
     .from("borrowers")
     .insert({
       lender_id: lender.id,
-      name: accountData.accountName.replace("Nomba/", ""), // strip prefix if present
+      name: cleanName, // ← now uses YOUR input, cleaned
       account_ref: accountRef,
       account_holder_id: accountData.accountHolderId,
       bank_account_number: accountData.bankAccountNumber,
-      phone: "+2348000000000",
+      phone: phone, // ← real phone passed in
     })
     .select()
     .single();
@@ -108,13 +117,17 @@ async function saveToDb(accountRef: string, accountData: any) {
   }
 
   // Create a loan
+  const principal = 1200;
+  const numInstallments = 6;
+  const installmentAmount = Math.ceil(principal / numInstallments);
+
   const { data: loan } = await supabase
     .from("loans")
     .insert({
       borrower_id: borrower.id,
-      principal_amount: 60000,
-      installment_amount: 10000,
-      num_installments: 6,
+      principal_amount: principal,
+      installment_amount: installmentAmount,
+      num_installments: numInstallments,
       start_date: new Date().toISOString().split("T")[0],
       status: "active",
     })
@@ -122,13 +135,13 @@ async function saveToDb(accountRef: string, accountData: any) {
     .single();
 
   if (loan) {
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= numInstallments; i++) {
       const dueDate = new Date();
       dueDate.setMonth(dueDate.getMonth() + i);
       await supabase.from("installments").insert({
         loan_id: loan.id,
         installment_number: i,
-        amount_due: 10000,
+        amount_due: installmentAmount,
         due_date: dueDate.toISOString().split("T")[0],
         status: "pending",
       });
@@ -136,16 +149,20 @@ async function saveToDb(accountRef: string, accountData: any) {
   }
 
   console.log("✅ Saved to DB:", borrower.id);
+  console.log("   Name:", cleanName);
+  console.log("   Phone:", phone);
+  console.log("   Account:", accountData.bankAccountNumber);
 }
 
 async function main() {
-  const accountRef = "borrower-live-prod-003";
-  const accountName = "Seed Shina Awole";
+  const accountRef = "borrower-live-prod-008";
+  const accountName = "Seed Jigan Eleniyan";
+  const phone = "+2348110813759"; // ← put the real phone here
 
   const result = await createLiveVirtualAccount(accountRef, accountName);
 
   if (result) {
-    await saveToDb(accountRef, result);
+    await saveToDb(accountRef, accountName, phone, result);
   }
 }
 
