@@ -9,9 +9,10 @@ dotenv.config();
 
 const app = express();
 
-// Parse JSON regardless of Content-Type
+// Parse JSON regardless of the Content-Type header Nomba sends
 app.use(express.json({ type: () => true }));
 
+// Webhook debug logging
 app.use((req: Request, res: Response, next) => {
   if (req.path === "/webhooks/nomba") {
     console.log("Webhook received:", {
@@ -31,8 +32,8 @@ app.use((req: Request, res: Response, next) => {
   next();
 });
 
-// ─── FIX: public folder is at project root, __dirname is dist/ ───
-const PUBLIC_DIR = path.join(__dirname, "public");
+// ─── FIX: public folder is at src/public, __dirname is dist/ ───
+const PUBLIC_DIR = path.join(__dirname, "..", "src", "public");
 app.use(express.static(PUBLIC_DIR));
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -184,30 +185,32 @@ app.get("/dashboard", (req: Request, res: Response) => {
 
 // ─── Webhook ───
 app.post("/webhooks/nomba", async (req: Request, res: Response) => {
+  // ACK immediately so Nomba doesn't retry while we process
+  res.status(200).send("ok");
+
   const signature = req.headers["nomba-signature"] as string;
   const timestamp = req.headers["nomba-timestamp"] as string;
   const secret = process.env.NOMBA_WEBHOOK_SECRET as string;
 
   if (!signature || !timestamp) {
     console.error("Missing signature/timestamp headers");
-    return res.status(400).send("Missing headers");
+    return;
   }
 
   const isValid = verifyNombaSignature(req.body, signature, timestamp, secret);
   if (!isValid) {
     console.error("Invalid signature");
-    return res.status(401).send("Invalid signature");
+    return;
   }
 
   try {
     const result = await handleNombaWebhook(req.body);
-    return res.status(200).json(result);
+    console.log("Webhook handled:", result);
   } catch (err) {
     console.error(
       "Webhook processing error:",
       err instanceof Error ? err.message : "Unknown error",
     );
-    return res.status(200).send("Received with error");
   }
 });
 
