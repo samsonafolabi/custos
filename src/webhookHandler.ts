@@ -39,10 +39,17 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     return { status: "unmatched", reason: "borrower_not_found" };
   }
 
-  // 4. Find next unpaid installment
+  // 4. Find next unpaid installment — scoped to THIS borrower's loans only.
+  // Previously this queried installments globally with no borrower filter,
+  // which meant a payment from Borrower A could get matched against
+  // Borrower B's installment the moment more than one borrower had a
+  // pending installment. loans!inner(borrower_id) filters via the join.
   const { data: nextInstallment } = await supabase
     .from("installments")
-    .select("id, amount_due, status, due_date, loan_id")
+    .select(
+      "id, amount_due, status, due_date, loan_id, loans!inner(borrower_id)",
+    )
+    .eq("loans.borrower_id", borrower.id)
     .eq("status", "pending")
     .order("due_date", { ascending: true })
     .limit(1)
