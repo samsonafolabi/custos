@@ -12,7 +12,7 @@ export interface NombaWebhookPayload {
       time: string;
       responseCode?: string;
       aliasAccountReference?: string; // the account_ref
-      amount?: string; // Nomba sends amount as string
+      transactionAmount?: number; // real field name; Nomba sends this as a number, not a string
     };
     customer?: {
       senderName?: string;
