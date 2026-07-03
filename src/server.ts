@@ -9,6 +9,26 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use((req: Request, res: Response, next) => {
+  if (req.path === "/webhooks/nomba") {
+    console.log("=== INCOMING WEBHOOK ===");
+    console.log(
+      "Headers:",
+      JSON.stringify(
+        {
+          "nomba-signature": req.headers["nomba-signature"],
+          "nomba-timestamp": req.headers["nomba-timestamp"],
+          "content-type": req.headers["content-type"],
+        },
+        null,
+        2,
+      ),
+    );
+    console.log("Body:", JSON.stringify(req.body, null, 2));
+    console.log("========================");
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, "public")));
 
 const PORT = process.env.PORT || 3000;
