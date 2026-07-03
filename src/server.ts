@@ -177,31 +177,31 @@ app.get("/dashboard", (req: Request, res: Response) => {
 
 // ─── Webhook ───
 app.post("/webhooks/nomba", async (req: Request, res: Response) => {
-  // TEMP: acknowledge immediately so Nomba doesn't retry/flag the endpoint
-  // while we confirm signature verification is working end-to-end.
-  // REMOVE this early response once verified — as written it accepts
-  // any request before checking the signature.
-  res.status(200).send("ok");
-
   const signature = req.headers["nomba-signature"] as string;
   const timestamp = req.headers["nomba-timestamp"] as string;
   const secret = process.env.NOMBA_WEBHOOK_SECRET as string;
 
   if (!signature || !timestamp) {
     console.error("Missing signature/timestamp headers");
-    return;
+    return res.status(400).send("Missing headers");
   }
 
   const isValid = verifyNombaSignature(req.body, signature, timestamp, secret);
   if (!isValid) {
     console.error("Invalid signature");
-    return;
+    return res.status(401).send("Invalid signature");
   }
 
   try {
-    await handleNombaWebhook(req.body);
+    const result = await handleNombaWebhook(req.body);
+    return res.status(200).json(result);
   } catch (err) {
     console.error("Webhook error:", err);
+    // Still 200 here: this means we verified the request came from Nomba,
+    // but something in our own processing failed. Returning non-2xx would
+    // make Nomba retry-storm us with the same payload every 2/5/11/24/53 min
+    // even though the failure is on our side, not theirs.
+    return res.status(200).send("Received with error");
   }
 });
 
