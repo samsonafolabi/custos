@@ -155,9 +155,9 @@ async function saveToDb(
 }
 
 async function main() {
-  const accountRef = "borrower-live-prod-008";
-  const accountName = "Seed Jigan Eleniyan";
-  const phone = "+2348110813759"; // ← put the real phone here
+  const accountRef = "borrower-live-prod-010";
+  const accountName = "Seed Juju Prince";
+  const phone = "+2348810363759"; // ← put the real phone here
 
   const result = await createLiveVirtualAccount(accountRef, accountName);
 

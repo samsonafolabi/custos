@@ -9,8 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// Parse JSON regardless of the Content-Type header Nomba sends —
-// this is the fix for req.body coming through as undefined.
+// Parse JSON regardless of Content-Type
 app.use(express.json({ type: () => true }));
 
 app.use((req: Request, res: Response, next) => {
@@ -24,8 +23,6 @@ app.use((req: Request, res: Response, next) => {
       contentLength: req.headers["content-length"],
     });
 
-    // Full header/body dump — off by default. Set DEBUG_WEBHOOK_VERBOSE=true
-    // in Railway temporarily if you need to chase a payload-shape issue.
     if (process.env.DEBUG_WEBHOOK_VERBOSE === "true") {
       console.log("Headers:", JSON.stringify(req.headers, null, 2));
       console.log("Body:", JSON.stringify(req.body, null, 2));
@@ -33,9 +30,12 @@ app.use((req: Request, res: Response, next) => {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = process.env.PORT || 3000;
+// ─── FIX: public folder is at project root, __dirname is dist/ ───
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+app.use(express.static(PUBLIC_DIR));
+
+const PORT = parseInt(process.env.PORT || "3000", 10);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Custos is alive");
@@ -135,7 +135,6 @@ app.post("/api/disputes/:id/resolve", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid action" });
   }
 
-  // Get dispute
   const { data: dispute } = await supabase
     .from("disputes")
     .select("*, payments (*)")
@@ -146,7 +145,6 @@ app.post("/api/disputes/:id/resolve", async (req: Request, res: Response) => {
     return res.status(404).json({ error: "Dispute not found" });
   }
 
-  // Update dispute
   await supabase
     .from("disputes")
     .update({
@@ -156,7 +154,6 @@ app.post("/api/disputes/:id/resolve", async (req: Request, res: Response) => {
     })
     .eq("id", id);
 
-  // If claimed, update payment and installment
   if (action === "claimed") {
     await supabase
       .from("payments")
@@ -182,7 +179,7 @@ app.post("/api/disputes/:id/resolve", async (req: Request, res: Response) => {
 
 // ─── Dashboard ───
 app.get("/dashboard", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+  res.sendFile(path.join(PUBLIC_DIR, "dashboard.html"));
 });
 
 // ─── Webhook ───
@@ -210,14 +207,10 @@ app.post("/webhooks/nomba", async (req: Request, res: Response) => {
       "Webhook processing error:",
       err instanceof Error ? err.message : "Unknown error",
     );
-    // Still 200 here: this means we verified the request came from Nomba,
-    // but something in our own processing failed. Returning non-2xx would
-    // make Nomba retry-storm us with the same payload every 2/5/11/24/53 min
-    // even though the failure is on our side, not theirs.
     return res.status(200).send("Received with error");
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
