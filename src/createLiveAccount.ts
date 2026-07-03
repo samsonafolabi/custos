@@ -37,24 +37,33 @@ async function createLiveVirtualAccount(
   const accountId = process.env.NOMBA_MAIN_ACCOUNT_ID;
   const subAccountId = process.env.NOMBA_SUB_ACCOUNT_ID; // your sub-account ID
 
-  const payload: any = {
+  if (!subAccountId) {
+    throw new Error(
+      "NOMBA_SUB_ACCOUNT_ID is not set — required in the URL path for webhooks to fire on this account.",
+    );
+  }
+
+  const payload = {
     accountRef,
     accountName,
     currency: "NGN",
   };
 
-  // If Nomba requires sub-account scoping, uncomment below:
-  // payload.subAccountId = subAccountId;
-
-  const res = await fetch("https://api.nomba.com/v1/accounts/virtual", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      accountId: accountId as string,
+  // subAccountId goes in the URL path, not the body or headers —
+  // per Nomba's dev community, webhooks don't attach to the account
+  // unless it's provisioned this way.
+  const res = await fetch(
+    `https://api.nomba.com/v1/accounts/virtual/${subAccountId}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        accountId: accountId as string,
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   const data = await res.json();
   console.log("Live create response:", JSON.stringify(data, null, 2));
@@ -130,8 +139,8 @@ async function saveToDb(accountRef: string, accountData: any) {
 }
 
 async function main() {
-  const accountRef = "borrower-live-prod-001";
-  const accountName = "Live Test Borrower";
+  const accountRef = "borrower-live-prod-003";
+  const accountName = "Seed Shina Awole";
 
   const result = await createLiveVirtualAccount(accountRef, accountName);
 
