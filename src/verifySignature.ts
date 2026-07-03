@@ -8,7 +8,10 @@ export function verifyNombaSignature(
   secret: string,
 ): boolean {
   if (!payload || typeof payload !== "object") {
-    console.error("verifyNombaSignature: payload is not an object", payload);
+    console.error(
+      "verifyNombaSignature: payload is not an object, got:",
+      typeof payload,
+    );
     return false;
   }
 
@@ -38,7 +41,11 @@ export function verifyNombaSignature(
     timestamp,
   ].join(":");
 
-  console.log("Hashing payload:", hashingPayload);
+  // Off by default — set DEBUG_WEBHOOK_VERBOSE=true temporarily if signatures
+  // start mismatching and you need to see exactly what string was hashed.
+  if (process.env.DEBUG_WEBHOOK_VERBOSE === "true") {
+    console.log("Hashing payload:", hashingPayload);
+  }
 
   const expectedSignature = crypto
     .createHmac("sha256", secret)
@@ -56,6 +63,8 @@ export function verifyNombaSignature(
   }
 
   const isValid = crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
-  console.log("Signature valid:", isValid);
+  if (!isValid) {
+    console.error("Signature verification failed for requestId:", requestId);
+  }
   return isValid;
 }

@@ -15,11 +15,21 @@ app.use(express.json({ type: () => true }));
 
 app.use((req: Request, res: Response, next) => {
   if (req.path === "/webhooks/nomba") {
-    console.log("=== INCOMING WEBHOOK ===");
-    console.log("Method/URL:", req.method, req.originalUrl);
-    console.log("Headers:", JSON.stringify(req.headers, null, 2));
-    console.log("Body:", JSON.stringify(req.body, null, 2));
-    console.log("========================");
+    console.log("Webhook received:", {
+      method: req.method,
+      timestamp: new Date().toISOString(),
+      hasSignature: !!req.headers["nomba-signature"],
+      hasTimestamp: !!req.headers["nomba-timestamp"],
+      eventType: req.body?.event_type ?? req.body?.type ?? "unknown",
+      contentLength: req.headers["content-length"],
+    });
+
+    // Full header/body dump — off by default. Set DEBUG_WEBHOOK_VERBOSE=true
+    // in Railway temporarily if you need to chase a payload-shape issue.
+    if (process.env.DEBUG_WEBHOOK_VERBOSE === "true") {
+      console.log("Headers:", JSON.stringify(req.headers, null, 2));
+      console.log("Body:", JSON.stringify(req.body, null, 2));
+    }
   }
   next();
 });
@@ -196,7 +206,10 @@ app.post("/webhooks/nomba", async (req: Request, res: Response) => {
     const result = await handleNombaWebhook(req.body);
     return res.status(200).json(result);
   } catch (err) {
-    console.error("Webhook error:", err);
+    console.error(
+      "Webhook processing error:",
+      err instanceof Error ? err.message : "Unknown error",
+    );
     // Still 200 here: this means we verified the request came from Nomba,
     // but something in our own processing failed. Returning non-2xx would
     // make Nomba retry-storm us with the same payload every 2/5/11/24/53 min
