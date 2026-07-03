@@ -32,7 +32,7 @@ app.use((req: Request, res: Response, next) => {
 });
 
 // ─── FIX: public folder is at project root, __dirname is dist/ ───
-const PUBLIC_DIR = path.join(__dirname, "..", "public");
+const PUBLIC_DIR = path.join(__dirname, "public");
 app.use(express.static(PUBLIC_DIR));
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
