@@ -1,0 +1,402 @@
+/* ── TOPBAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 8px 24px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--purple), #7c68e0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  font-size: 13px;
+  color: #16151c;
+}
+.brand-name {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+}
+nav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+nav a:hover {
+  color: var(--text);
+}
+nav a.active {
+  color: #16151c;
+  background: var(--text);
+}
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.nav-badge {
+  background: var(--danger);
+  color: #16151c;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.profile-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 14px 6px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--yellow), #d9c765);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  font-size: 11px;
+  color: #16151c;
+}
+.profile-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+.profile-role {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-size: 15px;
+}
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--purple);
+}
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 18px;
+  position: relative;
+}
+.stat-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.stat-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stat-value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 27px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  margin-top: 14px;
+}
+.stat-value.accent {
+  color: var(--purple);
+}
+.stat-value.gold {
+  color: var(--yellow);
+}
+.stat-value.warning {
+  color: var(--warning);
+}
+.stat-value.danger {
+  color: var(--danger);
+}
+.stat-meta {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* ── TABLE ── */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.table-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.table-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  padding: 12px 22px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.015);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:last-child {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+td {
+  padding: 14px 22px;
+  font-size: 13px;
+  color: var(--text);
+  vertical-align: middle;
+}
+.mono {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.badge-partial {
+  background: var(--yellow-dim);
+  color: var(--yellow);
+  border: 1px solid rgba(239, 227, 138, 0.25);
+}
+.badge-overpaid {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(164, 143, 255, 0.25);
+}
+.badge-unmatched {
+  background: rgba(240, 114, 140, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(240, 114, 140, 0.25);
+}
+.badge-pending {
+  background: rgba(140, 140, 151, 0.14);
+  color: var(--muted);
+  border: 1px solid rgba(140, 140, 151, 0.2);
+}
+.badge-paid {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(164, 143, 255, 0.25);
+}
+.badge-active {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(164, 143, 255, 0.25);
+}
+.badge-overdue {
+  background: rgba(240, 114, 140, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(240, 114, 140, 0.25);
+}
+
+/* ── PROGRESS ── */
+.progress-wrap {
+  width: 100%;
+  max-width: 150px;
+}
+.progress-bar-bg {
+  height: 5px;
+  background: var(--surface-2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: 5px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--yellow));
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+.progress-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* ── ACTION BUTTONS ── */
+.action-btn {
+  padding: 7px 15px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  font-family: "Inter", sans-serif;
+  transition: all 0.15s;
+  margin-right: 6px;
+}
+.btn-reassign {
+  background: var(--purple-dim);
+  border-color: rgba(164, 143, 255, 0.3);
+  color: var(--purple);
+}
+.btn-reassign:hover {
+  background: rgba(164, 143, 255, 0.2);
+}
+.btn-refund {
+  background: var(--yellow-dim);
+  border-color: rgba(239, 227, 138, 0.3);
+  color: var(--yellow);
+}
+.btn-refund:hover {
+  background: rgba(239, 227, 138, 0.22);
+}
+.btn-writeoff {
+  background: rgba(240, 114, 140, 0.1);
+  border-color: rgba(240, 114, 140, 0.3);
+  color: var(--danger);
+}
+.btn-writeoff:hover {
+  background: rgba(240, 114, 140, 0.18);
+}
+
+/* ── REASONING ── */
+.reasoning-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.5;
+  max-width: 340px;
+}
+.reasoning-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 4px;
+}
+
+.days-overdue {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+}

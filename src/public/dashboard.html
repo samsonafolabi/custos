@@ -8,533 +8,9 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      :root {
-        --page: #131316;
-        --bg: #1b1b20;
-        --surface: #212126;
-        --surface-2: #26262c;
-        --border: #2e2e35;
-        --purple: #a48fff;
-        --purple-dim: rgba(164, 143, 255, 0.12);
-        --yellow: #efe38a;
-        --yellow-dim: rgba(239, 227, 138, 0.14);
-        --accent: #a48fff;
-        --warning: #f0b860;
-        --danger: #f0728c;
-        --text: #f5f5f7;
-        --muted: #8c8c97;
-        --radius-lg: 24px;
-        --radius: 18px;
-        --radius-sm: 12px;
-        --radius-pill: 999px;
-      }
-      body {
-        font-family: "Inter", sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        padding: 0;
-      }
-      .shell {
-        max-width: 1360px;
-        margin: 0 auto;
-        background: var(--bg);
-        padding: 20px 20px 32px;
-      }
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 6px 8px 24px;
-      }
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 16px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-pill);
-      }
-      .brand-mark {
-        width: 26px;
-        height: 26px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, var(--purple), #7c68e0);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: "JetBrains Mono", monospace;
-        font-weight: 600;
-        font-size: 13px;
-        color: #16151c;
-      }
-      .brand-name {
-        font-weight: 600;
-        font-size: 14px;
-        letter-spacing: -0.2px;
-      }
-      nav {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-pill);
-        padding: 4px;
-      }
-      nav a {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 18px;
-        border-radius: var(--radius-pill);
-        color: var(--muted);
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        white-space: nowrap;
-      }
-      nav a:hover {
-        color: var(--text);
-      }
-      nav a.active {
-        color: #16151c;
-        background: var(--text);
-      }
-      .nav-icon {
-        width: 16px;
-        height: 16px;
-        display: inline-block;
-        vertical-align: middle;
-      }
-      .nav-badge {
-        background: var(--danger);
-        color: #16151c;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 1px 6px;
-        border-radius: 20px;
-        font-family: "JetBrains Mono", monospace;
-      }
-      .profile-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .profile-chip {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        padding: 6px 14px 6px 6px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-pill);
-        cursor: pointer;
-      }
-      .profile-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--yellow), #d9c765);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: "JetBrains Mono", monospace;
-        font-weight: 600;
-        font-size: 11px;
-        color: #16151c;
-      }
-      .profile-name {
-        font-size: 12px;
-        font-weight: 600;
-      }
-      .profile-role {
-        font-size: 10px;
-        color: var(--muted);
-      }
-      .icon-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: var(--muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.15s ease;
-        font-size: 15px;
-      }
-      .icon-btn:hover {
-        color: var(--text);
-        border-color: var(--purple);
-      }
-      main {
-        padding: 0 8px;
-      }
-      .view {
-        display: none;
-      }
-      .view.active {
-        display: block;
-      }
-      .page-header {
-        margin-bottom: 22px;
-        padding: 4px 4px 0;
-      }
-      .page-title {
-        font-size: 30px;
-        font-weight: 700;
-        color: var(--text);
-        letter-spacing: -0.6px;
-      }
-      .page-title span {
-        color: var(--muted);
-        font-weight: 500;
-      }
-      .page-sub {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 6px;
-      }
-      .stats-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 14px;
-        margin-bottom: 20px;
-      }
-      .stat-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 20px 20px 18px;
-        position: relative;
-      }
-      .stat-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-      }
-      .stat-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-      }
-      .stat-dot {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .stat-value {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 27px;
-        font-weight: 600;
-        color: var(--text);
-        line-height: 1;
-        margin-top: 14px;
-      }
-      .stat-value.accent {
-        color: var(--purple);
-      }
-      .stat-value.gold {
-        color: var(--yellow);
-      }
-      .stat-value.warning {
-        color: var(--warning);
-      }
-      .stat-value.danger {
-        color: var(--danger);
-      }
-      .stat-meta {
-        font-size: 11.5px;
-        color: var(--muted);
-        margin-top: 8px;
-      }
-      .table-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        overflow: hidden;
-      }
-      .table-header {
-        padding: 18px 22px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .table-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
-      }
-      .table-count {
-        font-size: 11px;
-        color: var(--muted);
-        font-family: "JetBrains Mono", monospace;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      thead th {
-        padding: 12px 22px;
-        text-align: left;
-        font-size: 10.5px;
-        font-weight: 600;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        border-bottom: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.015);
-      }
-      tbody tr {
-        border-bottom: 1px solid var(--border);
-        transition: background 0.1s;
-      }
-      tbody tr:last-child {
-        border-bottom: none;
-      }
-      tbody tr:hover {
-        background: rgba(255, 255, 255, 0.02);
-      }
-      td {
-        padding: 14px 22px;
-        font-size: 13px;
-        color: var(--text);
-        vertical-align: middle;
-      }
-      .mono {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 13px;
-      }
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 3px 10px;
-        border-radius: var(--radius-pill);
-        font-size: 10.5px;
-        font-weight: 600;
-        font-family: "JetBrains Mono", monospace;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-      }
-      .badge-partial {
-        background: var(--yellow-dim);
-        color: var(--yellow);
-        border: 1px solid rgba(239, 227, 138, 0.25);
-      }
-      .badge-overpaid {
-        background: var(--purple-dim);
-        color: var(--purple);
-        border: 1px solid rgba(164, 143, 255, 0.25);
-      }
-      .badge-unmatched {
-        background: rgba(240, 114, 140, 0.12);
-        color: var(--danger);
-        border: 1px solid rgba(240, 114, 140, 0.25);
-      }
-      .badge-pending {
-        background: rgba(140, 140, 151, 0.14);
-        color: var(--muted);
-        border: 1px solid rgba(140, 140, 151, 0.2);
-      }
-      .badge-paid {
-        background: var(--purple-dim);
-        color: var(--purple);
-        border: 1px solid rgba(164, 143, 255, 0.25);
-      }
-      .badge-active {
-        background: var(--purple-dim);
-        color: var(--purple);
-        border: 1px solid rgba(164, 143, 255, 0.25);
-      }
-      .badge-overdue {
-        background: rgba(240, 114, 140, 0.12);
-        color: var(--danger);
-        border: 1px solid rgba(240, 114, 140, 0.25);
-      }
-      .progress-wrap {
-        width: 100%;
-        max-width: 150px;
-      }
-      .progress-bar-bg {
-        height: 5px;
-        background: var(--surface-2);
-        border-radius: var(--radius-pill);
-        overflow: hidden;
-        margin-top: 5px;
-      }
-      .progress-bar-fill {
-        height: 100%;
-        background: linear-gradient(90deg, var(--purple), var(--yellow));
-        border-radius: var(--radius-pill);
-        transition: width 0.3s ease;
-      }
-      .progress-label {
-        font-size: 11px;
-        color: var(--muted);
-        font-family: "JetBrains Mono", monospace;
-      }
-      .action-btn {
-        padding: 7px 15px;
-        border-radius: var(--radius-pill);
-        font-size: 11.5px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid;
-        font-family: "Inter", sans-serif;
-        transition: all 0.15s;
-        margin-right: 6px;
-      }
-      .btn-reassign {
-        background: var(--purple-dim);
-        border-color: rgba(164, 143, 255, 0.3);
-        color: var(--purple);
-      }
-      .btn-reassign:hover {
-        background: rgba(164, 143, 255, 0.2);
-      }
-      .btn-refund {
-        background: var(--yellow-dim);
-        border-color: rgba(239, 227, 138, 0.3);
-        color: var(--yellow);
-      }
-      .btn-refund:hover {
-        background: rgba(239, 227, 138, 0.22);
-      }
-      .btn-writeoff {
-        background: rgba(240, 114, 140, 0.1);
-        border-color: rgba(240, 114, 140, 0.3);
-        color: var(--danger);
-      }
-      .btn-writeoff:hover {
-        background: rgba(240, 114, 140, 0.18);
-      }
-      .reasoning-box {
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 8px 12px;
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 6px;
-        line-height: 1.5;
-        max-width: 340px;
-      }
-      .reasoning-label {
-        font-size: 10px;
-        font-weight: 700;
-        color: var(--purple);
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        margin-bottom: 4px;
-      }
-      .days-overdue {
-        font-family: "JetBrains Mono", monospace;
-        font-size: 13px;
-        font-weight: 500;
-      }
-      .empty-state {
-        padding: 60px 22px;
-        text-align: center;
-        color: var(--muted);
-      }
-      .empty-icon {
-        width: 48px;
-        height: 48px;
-        margin: 0 auto 14px;
-        border-radius: 50%;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-      }
-      .empty-title {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--text);
-        margin-bottom: 6px;
-      }
-      .empty-sub {
-        font-size: 13px;
-      }
-      .loading {
-        padding: 40px 22px;
-        text-align: center;
-        color: var(--muted);
-        font-size: 13px;
-        font-family: "JetBrains Mono", monospace;
-      }
-      #toast {
-        position: fixed;
-        bottom: 28px;
-        right: 28px;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: var(--text);
-        padding: 12px 20px;
-        border-radius: var(--radius);
-        font-size: 13px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        transform: translateY(80px);
-        opacity: 0;
-        transition: all 0.25s ease;
-        z-index: 999;
-        max-width: 320px;
-      }
-      #toast.show {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      #toast.success {
-        border-left: 3px solid var(--purple);
-      }
-      #toast.error {
-        border-left: 3px solid var(--danger);
-      }
-      @media (max-width: 900px) {
-        .stats-row {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .topbar {
-          flex-wrap: wrap;
-        }
-        nav {
-          order: 3;
-          width: 100%;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <link rel="stylesheet" href="/css/modal.css" />
   </head>
   <body>
     <div class="shell">
@@ -614,7 +90,7 @@
               <div class="profile-role">Lender</div>
             </div>
           </div>
-          <a href="#" class="icon-btn danger" title="Log out">↩</a>
+          <a href="#" class="icon-btn" title="Log out">↩</a>
         </div>
       </div>
 
@@ -629,7 +105,7 @@
               Loan portfolio — repayment status by borrower
             </div>
           </div>
-          <div class="stats-row" id="borrower-stats">
+          <div class="stats-row">
             <div class="stat-card">
               <div class="stat-top">
                 <div class="stat-label">Total Borrowers</div>
@@ -665,8 +141,29 @@
           </div>
           <div class="table-card">
             <div class="table-header">
-              <span class="table-title">Loan Portfolio</span
-              ><span class="table-count" id="borrower-count">Loading...</span>
+              <span class="table-title">Loan Portfolio</span>
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span class="table-count" id="borrower-count">Loading...</span>
+                <button
+                  class="btn-add-borrower"
+                  onclick="openAddBorrowerModal()"
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Borrower
+                </button>
+              </div>
             </div>
             <div id="borrowers-table-wrap">
               <div class="loading">Fetching borrowers...</div>
@@ -718,8 +215,8 @@
           </div>
           <div class="table-card">
             <div class="table-header">
-              <span class="table-title">Open Disputes</span
-              ><span class="table-count" id="disputes-count">Loading...</span>
+              <span class="table-title">Open Disputes</span>
+              <span class="table-count" id="disputes-count">Loading...</span>
             </div>
             <div id="disputes-table-wrap">
               <div class="loading">Fetching disputes...</div>
@@ -771,8 +268,8 @@
           </div>
           <div class="table-card">
             <div class="table-header">
-              <span class="table-title">Overdue Installments</span
-              ><span class="table-count" id="aging-count">Loading...</span>
+              <span class="table-title">Overdue Installments</span>
+              <span class="table-count" id="aging-count">Loading...</span>
             </div>
             <div id="aging-table-wrap">
               <div class="loading">Fetching aging data...</div>
@@ -782,226 +279,36 @@
       </main>
     </div>
 
+    <!-- TOAST -->
     <div id="toast"></div>
 
-    <script>
-      function showView(name) {
-        document
-          .querySelectorAll(".view")
-          .forEach((v) => v.classList.remove("active"));
-        document
-          .querySelectorAll("nav a")
-          .forEach((a) => a.classList.remove("active"));
-        document.getElementById("view-" + name).classList.add("active");
-        document.getElementById("nav-" + name).classList.add("active");
-      }
-      function toast(msg, type = "success") {
-        const el = document.getElementById("toast");
-        el.textContent = msg;
-        el.className = "show " + type;
-        setTimeout(() => {
-          el.className = "";
-        }, 3000);
-      }
-      function naira(amount) {
-        if (amount == null) return "—";
-        return (
-          "₦" +
-          Number(amount).toLocaleString("en-NG", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-        );
-      }
-      function fmtDate(d) {
-        if (!d) return "—";
-        return new Date(d).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        });
-      }
-      function daysOverdue(dueDate) {
-        return Math.floor((Date.now() - new Date(dueDate)) / 86400000);
-      }
-      function makeBadge(status) {
-        return `<span class="badge badge-${status}">${status}</span>`;
-      }
+    <!-- ADD BORROWER MODAL -->
+    <div class="modal-overlay" id="borrower-modal">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title" id="modal-title">New Borrower</div>
+            <div class="modal-sub" id="modal-sub">
+              Fill in borrower and loan details
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-steps" id="modal-steps-wrap">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
 
-      async function loadBorrowers() {
-        try {
-          const res = await fetch("/api/portfolio");
-          const borrowers = await res.json();
-          let totalCollected = 0,
-            totalDue = 0,
-            activeLoans = 0;
-          const rows = borrowers
-            .map((b) => {
-              const loan = b.loans?.[0];
-              if (!loan) return "";
-              const inst = loan.installments || [];
-              const paid = inst.filter((i) => i.status === "paid").length;
-              const total = inst.length;
-              const collected = paid * loan.installment_amount;
-              const due = total * loan.installment_amount;
-              const pct = total ? Math.round((paid / total) * 100) : 0;
-              totalCollected += collected;
-              totalDue += due;
-              if (loan.status === "active") activeLoans++;
-              const next = inst
-                .filter((i) => i.status === "pending" || i.status === "partial")
-                .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))[0];
-              const nextDue = next ? fmtDate(next.due_date) : "Complete";
-              const overdue = next && new Date(next.due_date) < new Date();
-              return `<tr><td><div style="font-weight:500">${b.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${b.phone || "—"}</div></td><td class="mono">${naira(loan.principal_amount)}</td><td><div class="progress-wrap"><div class="progress-label">${paid}/${total} installments</div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div></div></td><td class="mono">${naira(collected)}</td><td class="mono" style="color:var(--muted)">${naira(due - collected)}</td><td style="color:${overdue ? "var(--danger)" : "var(--muted)"};font-size:13px">${nextDue}</td><td>${makeBadge(loan.status)}</td></tr>`;
-            })
-            .join("");
-          document.getElementById("stat-total-borrowers").textContent =
-            borrowers.length;
-          document.getElementById("stat-active-loans").textContent =
-            activeLoans;
-          document.getElementById("stat-collected").textContent =
-            naira(totalCollected);
-          document.getElementById("stat-outstanding").textContent = naira(
-            totalDue - totalCollected,
-          );
-          document.getElementById("borrower-count").textContent =
-            `${borrowers.length} borrowers`;
-          document.getElementById("borrowers-table-wrap").innerHTML =
-            borrowers.length === 0
-              ? `<div class="empty-state"><div class="empty-icon">◈</div><div class="empty-title">No borrowers yet</div><div class="empty-sub">Create a borrower and disburse a loan to get started</div></div>`
-              : `<table><thead><tr><th>Borrower</th><th>Principal</th><th>Progress</th><th>Collected</th><th>Outstanding</th><th>Next Due</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
-        } catch (e) {
-          document.getElementById("borrowers-table-wrap").innerHTML =
-            `<div class="empty-state"><div class="empty-title">Failed to load</div><div class="empty-sub">${e.message}</div></div>`;
-        }
-      }
-
-      async function loadDisputes() {
-        try {
-          const res = await fetch("/api/disputes");
-          const disputes = await res.json();
-          if (!Array.isArray(disputes)) {
-            document.getElementById("disputes-table-wrap").innerHTML =
-              `<div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">API Error</div><div class="empty-sub">${disputes.error || "Unexpected response"}</div></div>`;
-            return;
-          }
-          const partial = disputes.filter((d) => d.type === "partial").length;
-          const overpaid = disputes.filter((d) => d.type === "overpaid").length;
-          const unmatched = disputes.filter(
-            (d) => d.type === "unmatched",
-          ).length;
-          document.getElementById("stat-open-disputes").textContent =
-            disputes.length;
-          document.getElementById("stat-partial").textContent = partial;
-          document.getElementById("stat-overpaid").textContent = overpaid;
-          document.getElementById("stat-unmatched").textContent = unmatched;
-          document.getElementById("disputes-count").textContent =
-            `${disputes.length} open`;
-          const badgeEl = document.getElementById("disputes-badge");
-          if (disputes.length > 0) {
-            badgeEl.textContent = disputes.length;
-            badgeEl.style.display = "inline";
-          } else {
-            badgeEl.style.display = "none";
-          }
-          if (disputes.length === 0) {
-            document.getElementById("disputes-table-wrap").innerHTML =
-              `<div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">No open disputes</div><div class="empty-sub">All payments matched cleanly</div></div>`;
-            return;
-          }
-          const rows = disputes
-            .map((d) => {
-              const name = d.borrowers?.name || "Unknown";
-              const amt = d.payments?.amount_received ?? 0;
-              const sender = d.payments?.sender_name_raw || "—";
-              const received = fmtDate(d.payments?.received_at);
-              const conf = d.confidence_score ?? "—";
-              const color =
-                conf >= 80
-                  ? "var(--purple)"
-                  : conf >= 50
-                    ? "var(--yellow)"
-                    : "var(--danger)";
-              return `<tr><td><div style="font-weight:500">${name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${d.borrowers?.phone || "—"}</div></td><td class="mono">${naira(amt)}</td><td style="color:var(--muted);font-size:12px">${sender}</td><td>${makeBadge(d.type)}</td><td><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:${color}">${conf}%</div>${d.reasoning ? `<div class="reasoning-box"><div class="reasoning-label">AI Reasoning</div>${d.reasoning}</div>` : ""}</td><td style="color:var(--muted);font-size:12px">${received}</td><td><button class="action-btn btn-reassign" onclick="resolveDispute('${d.id}','claimed','Claimed as partial payment')">Claim</button><button class="action-btn btn-refund" onclick="resolveDispute('${d.id}','refunded','Refund via Nomba')">Refund</button><button class="action-btn btn-writeoff" onclick="resolveDispute('${d.id}','written_off','Written off')">Write Off</button></td></tr>`;
-            })
-            .join("");
-          document.getElementById("disputes-table-wrap").innerHTML =
-            `<table><thead><tr><th>Borrower</th><th>Amount</th><th>Sender</th><th>Type</th><th>Confidence & Reasoning</th><th>Received</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
-        } catch (e) {
-          document.getElementById("disputes-table-wrap").innerHTML =
-            `<div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">Failed to load</div><div class="empty-sub">${e.message}</div></div>`;
-        }
-      }
-
-      async function resolveDispute(id, action, notes) {
-        try {
-          const res = await fetch(`/api/disputes/${id}/resolve`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action, notes }),
-          });
-          const data = await res.json();
-          if (data.success) {
-            toast(`Dispute ${action} successfully`, "success");
-            loadDisputes();
-          } else {
-            toast("Failed to resolve dispute", "error");
-          }
-        } catch (e) {
-          toast("Network error — try again", "error");
-        }
-      }
-
-      async function loadAging() {
-        try {
-          const res = await fetch("/api/aging");
-          const items = await res.json();
-          const total = items.reduce((s, i) => s + Number(i.amount_due), 0);
-          const oldest = items.length ? daysOverdue(items[0].due_date) : 0;
-          const atRisk = items.filter(
-            (i) => daysOverdue(i.due_date) > 30,
-          ).length;
-          document.getElementById("stat-total-overdue").textContent =
-            items.length;
-          document.getElementById("stat-amount-overdue").textContent =
-            naira(total);
-          document.getElementById("stat-oldest").textContent =
-            oldest > 0 ? oldest : "0";
-          document.getElementById("stat-at-risk").textContent = atRisk;
-          document.getElementById("aging-count").textContent =
-            `${items.length} overdue`;
-          if (items.length === 0) {
-            document.getElementById("aging-table-wrap").innerHTML =
-              `<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-title">No overdue installments</div><div class="empty-sub">All installments are current</div></div>`;
-            return;
-          }
-          const rows = items
-            .map((i) => {
-              const b = i.loans?.borrowers;
-              const days = daysOverdue(i.due_date);
-              const sev =
-                days > 60 ? "danger" : days > 30 ? "warning" : "muted";
-              const col =
-                sev === "danger"
-                  ? "var(--danger)"
-                  : sev === "warning"
-                    ? "var(--warning)"
-                    : "var(--muted)";
-              return `<tr><td><div style="font-weight:500">${b?.name || "—"}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${b?.phone || "—"}</div></td><td style="color:var(--muted);font-size:13px">Installment #${i.installment_number}</td><td class="mono">${naira(i.amount_due)}</td><td style="color:var(--muted);font-size:13px">${fmtDate(i.due_date)}</td><td><span class="days-overdue" style="color:${col}">${days}d overdue</span></td><td>${makeBadge(i.status)}</td></tr>`;
-            })
-            .join("");
-          document.getElementById("aging-table-wrap").innerHTML =
-            `<table><thead><tr><th>Borrower</th><th>Installment</th><th>Amount Due</th><th>Due Date</th><th>Days Overdue</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
-        } catch (e) {
-          document.getElementById("aging-table-wrap").innerHTML =
-            `<div class="empty-state"><div class="empty-title">Failed to load</div><div class="empty-sub">${e.message}</div></div>`;
-        }
-      }
-
-      loadBorrowers();
-      loadDisputes();
-      loadAging();
-    </script>
+    <!-- SCRIPTS — order matters: utils first, then views, then app -->
+    <script src="/js/utils.js"></script>
+    <script src="/js/views/portfolio.js"></script>
+    <script src="/js/views/disputes.js"></script>
+    <script src="/js/views/aging.js"></script>
+    <script src="/js/views/modal.js"></script>
+    <script src="/js/app.js"></script>
   </body>
 </html>
