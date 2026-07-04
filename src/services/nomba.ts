@@ -81,10 +81,12 @@ export async function disburseLoan(params: {
   recipientName: string;
   recipientAccountNumber: string;
   recipientBankCode: string;
+  recipientBankName?: string;
   narration: string;
   token: string;
 }): Promise<{ status: string; transferRef: string }> {
-  const res = await fetch(`${NOMBA_BASE}/v2/transfers/bank`, {
+  // subAccountId goes in the URL path, not the body
+  const res = await fetch(`${NOMBA_BASE}/v2/transfers/bank/${SUB_ACCOUNT_ID}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -100,7 +102,6 @@ export async function disburseLoan(params: {
       destinationAccountName: params.recipientName,
       narration: params.narration,
       currency: "NGN",
-      subAccountId: SUB_ACCOUNT_ID,
     }),
   });
 

@@ -21,6 +21,7 @@ router.post("/", async (req: Request, res: Response) => {
     startDate,
   } = req.body;
 
+  // Validate required fields
   if (
     !name ||
     !phone ||
@@ -34,11 +35,27 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
+  // Validate numeric fields
+  if (
+    typeof principalAmount !== "number" ||
+    principalAmount <= 0 ||
+    typeof installmentAmount !== "number" ||
+    installmentAmount <= 0 ||
+    typeof numInstallments !== "number" ||
+    numInstallments <= 0 ||
+    !Number.isInteger(numInstallments)
+  ) {
+    return res.status(400).json({
+      error:
+        "principalAmount, installmentAmount, and numInstallments must be positive numbers",
+    });
+  }
+
   try {
-    // 1. Authenticate
+    // 1. Authenticate with Nomba
     const token = await getNombaToken("live");
 
-    // 2. Create virtual account
+    // 2. Create virtual account (need this for the borrower's bank_account_number)
     const accountRef = `borrower-${Date.now()}`;
     const { bankAccountNumber, accountHolderId } = await createVirtualAccount(
       accountRef,
@@ -46,19 +63,7 @@ router.post("/", async (req: Request, res: Response) => {
       token,
     );
 
-    // 3. Disburse loan
-    const transferRef = `loan-${accountRef}`;
-    const disbursement = await disburseLoan({
-      amount: principalAmount,
-      transferRef,
-      recipientName: name,
-      recipientAccountNumber,
-      recipientBankCode,
-      narration: `Loan disbursement — ${name}`,
-      token,
-    });
-
-    // 4. Get lender
+    // 3. Get lender (must exist before saving borrower)
     const { data: lender } = await supabase
       .from("lenders")
       .select("id")
@@ -67,7 +72,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!lender) throw new Error("No lender found in database");
 
-    // 5. Save borrower
+    // 4. Save borrower to DB FIRST
     const { data: borrower } = await supabase
       .from("borrowers")
       .insert({
@@ -83,7 +88,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!borrower) throw new Error("Failed to save borrower");
 
-    // 6. Save loan
+    // 5. Save loan to DB
     const { data: loan } = await supabase
       .from("loans")
       .insert({
@@ -99,7 +104,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!loan) throw new Error("Failed to save loan");
 
-    // 7. Generate installments
+    // 6. Generate installments (first due 1 month after startDate)
     for (let i = 1; i <= numInstallments; i++) {
       const dueDate = new Date(startDate);
       dueDate.setMonth(dueDate.getMonth() + i);
@@ -111,6 +116,19 @@ router.post("/", async (req: Request, res: Response) => {
         status: "pending",
       });
     }
+
+    // 7. Disburse loan ONLY after everything is persisted
+    const transferRef = `loan-${accountRef}`;
+    const disbursement = await disburseLoan({
+      amount: principalAmount,
+      transferRef,
+      recipientName: name,
+      recipientAccountNumber,
+      recipientBankCode,
+      recipientBankName,
+      narration: `Loan disbursement — ${name}${recipientBankName ? ` (${recipientBankName})` : ""}`,
+      token,
+    });
 
     return res.status(201).json({
       success: true,
