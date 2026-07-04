@@ -85,8 +85,8 @@ export async function disburseLoan(params: {
   narration: string;
   token: string;
 }): Promise<{ status: string; transferRef: string }> {
-  // subAccountId goes in the URL path, not the body
-  const res = await fetch(`${NOMBA_BASE}/v2/transfers/bank/${SUB_ACCOUNT_ID}`, {
+  // Use parent account endpoint — no subAccountId in URL
+  const res = await fetch(`${NOMBA_BASE}/v2/transfers/bank`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -97,11 +97,10 @@ export async function disburseLoan(params: {
       amount: params.amount,
       merchantTxRef: params.transferRef,
       senderName: "Custos Lending",
-      destinationBankCode: params.recipientBankCode,
-      destinationAccountNumber: params.recipientAccountNumber,
-      destinationAccountName: params.recipientName,
+      accountNumber: params.recipientAccountNumber, // ← correct field name
+      bankCode: params.recipientBankCode, // ← correct field name
+      accountName: params.recipientName, // ← correct field name
       narration: params.narration,
-      currency: "NGN",
     }),
   });
 
