@@ -85,7 +85,6 @@ export async function disburseLoan(params: {
   narration: string;
   token: string;
 }): Promise<{ status: string; transferRef: string }> {
-  // Use parent account endpoint — no subAccountId in URL
   const res = await fetch(`${NOMBA_BASE}/v2/transfers/bank`, {
     method: "POST",
     headers: {
@@ -97,9 +96,9 @@ export async function disburseLoan(params: {
       amount: params.amount,
       merchantTxRef: params.transferRef,
       senderName: "Custos Lending",
-      accountNumber: params.recipientAccountNumber, // ← correct field name
-      bankCode: params.recipientBankCode, // ← correct field name
-      accountName: params.recipientName, // ← correct field name
+      accountNumber: params.recipientAccountNumber,
+      bankCode: params.recipientBankCode,
+      accountName: params.recipientName,
       narration: params.narration,
     }),
   });
@@ -107,7 +106,8 @@ export async function disburseLoan(params: {
   const data = await res.json();
   console.log("Disbursement response:", JSON.stringify(data, null, 2));
 
-  if (data.code !== "00") {
+  // Nomba returns status: true + code: "200" on success, not code: "00"
+  if (data.status !== true) {
     throw new Error(data.description || "Loan disbursement failed");
   }
 
