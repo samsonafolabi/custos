@@ -264,22 +264,46 @@ function renderSuccess(data) {
     "Borrower onboarded successfully";
   document.getElementById("modal-steps-wrap").innerHTML = "";
 
+  const firstDue = fmtDate(data.loan.startDate); // or calculate from installments if needed
+
   document.getElementById("modal-body").innerHTML = `
     <div class="success-state">
       <div class="success-icon">✓</div>
       <div class="success-title">${data.borrower.name}</div>
       <div class="success-sub">
-        ₦${Number(data.loan.principalAmount).toLocaleString()} disbursed · 
-        ${data.loan.numInstallments} installments of ₦${Number(data.loan.installmentAmount).toLocaleString()} created
+        ₦${Number(data.loan.principalAmount).toLocaleString()} disbursed
       </div>
-      <div class="nuban-display">
+      
+      <!-- Repayment schedule summary -->
+      <div style="display: flex; gap: 12px; margin: 16px 0; justify-content: center;">
+        <div style="background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; text-align: center;">
+          <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Monthly</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; color: var(--purple);">₦${Number(data.loan.installmentAmount).toLocaleString()}</div>
+        </div>
+        <div style="background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; text-align: center;">
+          <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">First Due</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; color: var(--yellow);">${firstDue}</div>
+        </div>
+        <div style="background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; text-align: center;">
+          <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">Term</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; color: var(--text);">${data.loan.numInstallments}mo</div>
+        </div>
+      </div>
+
+      <!-- Repayment VA -->
+      <div class="nuban-display" style="border-color: var(--purple); background: rgba(164,143,255,0.06);">
         <div>
-          <div class="nuban-label">Repayment Account (NUBAN)</div>
+          <div class="nuban-label">Repayment Account (share with borrower)</div>
           <div class="nuban-value">${data.borrower.bankAccountNumber}</div>
-          <div class="nuban-bank">Nombank MFB — share with borrower</div>
+          <div class="nuban-bank">Nombank MFB · ${data.borrower.accountRef}</div>
         </div>
         <button onclick="navigator.clipboard.writeText('${data.borrower.bankAccountNumber}').then(()=>toast('Copied!','success'))"
           class="btn-secondary" style="padding:6px 12px;font-size:11px">Copy</button>
+      </div>
+      
+      <div class="disbursement-banner" style="margin-top: 12px;">
+        <strong>Next step:</strong> Share the repayment account above with ${data.borrower.name}. 
+        All payments to this account will auto-reconcile against their loan.
       </div>
     </div>`;
 
