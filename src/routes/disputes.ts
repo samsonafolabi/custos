@@ -72,22 +72,90 @@ router.post("/:id/resolve", async (req: Request, res: Response) => {
     .eq("id", id);
 
   if (action === "claimed") {
+    // Get the payment and installment details
+    const { data: payment } = await supabase
+      .from("payments")
+      .select("*, installments!inner(*)")
+      .eq("id", dispute.payment_id)
+      .single();
+
+    if (!payment) {
+      return res.status(404).json({ error: "Payment not found" });
+    }
+
+    const amountReceived = parseFloat(payment.amount_received);
+    const amountDue = parseFloat(payment.installments.amount_due);
+
+    if (amountReceived >= amountDue) {
+      // Full payment — mark installment paid
+      await supabase
+        .from("installments")
+        .update({ status: "paid" })
+        .eq("id", payment.installment_id);
+    } else {
+      // Partial payment — mark partial, store shortfall info
+      await supabase
+        .from("installments")
+        .update({
+          status: "partial",
+          amount_paid: amountReceived,
+          amount_remaining: amountDue - amountReceived,
+        })
+        .eq("id", payment.installment_id);
+    }
+
+    // Mark payment as matched
     await supabase
       .from("payments")
       .update({ status: "matched" })
       .eq("id", dispute.payment_id);
 
-    const { data: payment } = await supabase
-      .from("payments")
-      .select("installment_id")
-      .eq("id", dispute.payment_id)
+    // Check if there's a credit balance to apply
+    const { data: borrower } = await supabase
+      .from("borrowers")
+      .select("credit_balance")
+      .eq("id", dispute.borrower_id)
       .single();
 
-    if (payment?.installment_id) {
-      await supabase
-        .from("installments")
-        .update({ status: "paid" })
-        .eq("id", payment.installment_id);
+    const creditBalance = parseFloat(borrower?.credit_balance || "0");
+
+    if (creditBalance > 0) {
+      // Try to apply credit to remaining balance on this installment
+      const remaining = amountDue - amountReceived;
+
+      if (creditBalance >= remaining) {
+        // Credit covers the rest — mark fully paid
+        await supabase
+          .from("installments")
+          .update({
+            status: "paid",
+            amount_paid: amountDue,
+            amount_remaining: 0,
+          })
+          .eq("id", payment.installment_id);
+
+        // Reduce credit balance
+        await supabase
+          .from("borrowers")
+          .update({ credit_balance: creditBalance - remaining })
+          .eq("id", dispute.borrower_id);
+      } else {
+        // Credit partially covers — reduce remaining
+        await supabase
+          .from("installments")
+          .update({
+            status: "partial",
+            amount_paid: amountReceived + creditBalance,
+            amount_remaining: remaining - creditBalance,
+          })
+          .eq("id", payment.installment_id);
+
+        // Zero out credit
+        await supabase
+          .from("borrowers")
+          .update({ credit_balance: 0 })
+          .eq("id", dispute.borrower_id);
+      }
     }
   }
 
