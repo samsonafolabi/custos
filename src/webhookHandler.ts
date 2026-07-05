@@ -1,7 +1,6 @@
 import { supabase } from "./db";
-import { NombaWebhookPayload } from "./types";
 
-export async function handleNombaWebhook(payload: NombaWebhookPayload) {
+export async function handleNombaWebhook(payload: any) {
   const nombaEventId = payload.requestId;
 
   // 1. Idempotency
@@ -23,8 +22,38 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     processed_at: new Date().toISOString(),
   });
 
-  // 3. Resolve borrower via aliasAccountReference (lives at data level, not transaction)
-  const accountRef = payload.data.aliasAccountReference;
+  // 3. Defensive field extraction — Nomba's payload structure varies between events
+  const merchant = payload.data?.merchant ?? {};
+  const transaction = payload.data?.transaction ?? {};
+
+  // aliasAccountReference — try data level first, then transaction
+  const accountRef =
+    payload.data?.aliasAccountReference ?? transaction?.aliasAccountReference;
+
+  // transactionAmount — try merchant first, then transaction
+  const rawAmount =
+    merchant?.transactionAmount ?? transaction?.transactionAmount ?? "0";
+
+  // transactionId — try merchant first, then transaction
+  const transactionId =
+    merchant?.transactionId ?? transaction?.transactionId ?? "";
+
+  // time — try merchant first, then transaction
+  const receivedAt =
+    merchant?.time ?? transaction?.time ?? new Date().toISOString();
+
+  // senderName
+  const senderName = payload.data?.customer?.senderName || null;
+
+  console.log("Resolved fields:", {
+    accountRef,
+    rawAmount,
+    transactionId,
+    receivedAt,
+    senderName,
+  });
+
+  // 4. Resolve borrower
   if (!accountRef) {
     console.log("No aliasAccountReference in payload");
     return { status: "unmatched", reason: "missing_account_ref" };
@@ -41,7 +70,7 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     return { status: "unmatched", reason: "borrower_not_found" };
   }
 
-  // 4. Get ALL pending installments for this borrower in due date order
+  // 5. Get ALL pending installments for this borrower in due date order
   const { data: pendingInstallments } = await supabase
     .from("installments")
     .select(
@@ -56,11 +85,8 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     return { status: "unmatched", reason: "no_pending_installment" };
   }
 
-  // 5. Calculate amounts in kobo to avoid float errors
-  // transactionAmount lives at data.merchant.transactionAmount
-  const amountReceivedKobo = Math.round(
-    parseFloat(String(payload.data.merchant.transactionAmount ?? "0")) * 100,
-  );
+  // 6. Calculate amounts in kobo to avoid float errors
+  const amountReceivedKobo = Math.round(parseFloat(String(rawAmount)) * 100);
   const creditBalanceKobo = Math.round(
     parseFloat(borrower.credit_balance || "0") * 100,
   );
@@ -70,36 +96,35 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     `Payment: ₦${amountReceivedKobo / 100} received + ₦${creditBalanceKobo / 100} credit = ₦${totalAvailableKobo / 100} total available`,
   );
 
-  // 6. Log payment record against first pending installment
+  // 7. Log payment record against first pending installment
   const { data: payment } = await supabase
     .from("payments")
     .insert({
       installment_id: pendingInstallments[0].id,
       borrower_id: borrower.id,
       amount_received: amountReceivedKobo / 100,
-      sender_name_raw: payload.data.customer?.senderName || null,
-      nomba_transaction_id: payload.data.merchant.transactionId,
+      sender_name_raw: senderName,
+      nomba_transaction_id: transactionId,
       status: "pending",
-      received_at: payload.data.merchant.time || new Date().toISOString(),
+      received_at: receivedAt,
     })
     .select()
     .single();
 
   if (!payment) throw new Error("Failed to create payment record");
 
-  // 7. Check if total available is less than first installment due — genuine underpayment
+  // 8. Check for genuine underpayment — less than first installment due
   const firstDueKobo = Math.round(
     parseFloat(pendingInstallments[0].amount_due) * 100,
   );
 
   if (totalAvailableKobo < firstDueKobo) {
-    // True underpayment — mark partial and create dispute
     await supabase
       .from("installments")
       .update({ status: "partial" })
       .eq("id", pendingInstallments[0].id);
 
-    // Consume any credit balance
+    // Consume any existing credit balance
     await supabase
       .from("borrowers")
       .update({ credit_balance: 0 })
@@ -135,7 +160,7 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     };
   }
 
-  // 8. Cascade payment forward across installments
+  // 9. Cascade payment forward across installments
   let remainingKobo = totalAvailableKobo;
   let installmentsFullyPaid = 0;
   let lastInstallmentId = pendingInstallments[0].id;
@@ -159,7 +184,6 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
 
       if (remainingKobo === 0) break;
     } else if (remainingKobo > 0) {
-      // Partial coverage of this installment — store remainder as credit
       await supabase
         .from("installments")
         .update({ status: "partial" })
@@ -176,7 +200,7 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     }
   }
 
-  // 9. Store remaining amount as credit balance
+  // 10. Store remaining as credit balance
   const creditRemaining = remainingKobo / 100;
   await supabase
     .from("borrowers")
@@ -189,7 +213,7 @@ export async function handleNombaWebhook(payload: NombaWebhookPayload) {
     );
   }
 
-  // 10. Mark payment as matched
+  // 11. Mark payment as matched
   await supabase
     .from("payments")
     .update({

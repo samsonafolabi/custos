@@ -1,8 +1,7 @@
 import crypto from "crypto";
-import { NombaWebhookPayload } from "./types";
 
 export function verifyNombaSignature(
-  payload: NombaWebhookPayload | any,
+  payload: any,
   receivedSignature: string,
   timestamp: string,
   secret: string,
@@ -12,15 +11,22 @@ export function verifyNombaSignature(
     return false;
   }
 
+  const merchant = payload?.data?.merchant ?? {};
+  const transaction = payload?.data?.transaction ?? {};
+
   const eventType = payload?.event_type ?? "";
   const requestId = payload?.requestId ?? "";
-  const userId = payload?.data?.merchant?.userId ?? "";
-  const walletId = payload?.data?.merchant?.walletId ?? "";
-  const transactionId = payload?.data?.merchant?.transactionId ?? "";
-  const transactionType = payload?.data?.type ?? "";
-  const transactionTime = payload?.data?.merchant?.time ?? "";
+  const userId = merchant?.userId ?? "";
+  const walletId = merchant?.walletId ?? "";
 
-  let responseCode = payload?.data?.merchant?.responseCode ?? "";
+  const transactionId =
+    merchant?.transactionId ?? transaction?.transactionId ?? "";
+
+  const transactionType = payload?.data?.type ?? transaction?.type ?? "";
+
+  const transactionTime = merchant?.time ?? transaction?.time ?? "";
+
+  let responseCode = merchant?.responseCode ?? transaction?.responseCode ?? "";
   if (responseCode === "null" || responseCode === null) {
     responseCode = "";
   }
