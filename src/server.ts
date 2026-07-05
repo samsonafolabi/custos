@@ -12,7 +12,7 @@ dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
-const PUBLIC_DIR = path.join(__dirname, "..", "src", "public");
+const PUBLIC_DIR = path.join(__dirname, "public");
 
 // ─── Middleware ───
 app.use(express.json({ type: () => true }));
