@@ -2,29 +2,25 @@ import crypto from "crypto";
 import { NombaWebhookPayload } from "./types";
 
 export function verifyNombaSignature(
-  payload: NombaWebhookPayload | any, // accept any during debugging
+  payload: NombaWebhookPayload | any,
   receivedSignature: string,
   timestamp: string,
   secret: string,
 ): boolean {
   if (!payload || typeof payload !== "object") {
-    console.error(
-      "verifyNombaSignature: payload is not an object, got:",
-      typeof payload,
-    );
+    console.error("verifyNombaSignature: payload is not an object");
     return false;
   }
 
-  // Safely extract fields with fallbacks
   const eventType = payload?.event_type ?? "";
   const requestId = payload?.requestId ?? "";
   const userId = payload?.data?.merchant?.userId ?? "";
   const walletId = payload?.data?.merchant?.walletId ?? "";
-  const transactionId = payload?.data?.transaction?.transactionId ?? "";
-  const transactionType = payload?.data?.transaction?.type ?? "";
-  const transactionTime = payload?.data?.transaction?.time ?? "";
+  const transactionId = payload?.data?.merchant?.transactionId ?? "";
+  const transactionType = payload?.data?.type ?? "";
+  const transactionTime = payload?.data?.merchant?.time ?? "";
 
-  let responseCode = payload?.data?.transaction?.responseCode ?? "";
+  let responseCode = payload?.data?.merchant?.responseCode ?? "";
   if (responseCode === "null" || responseCode === null) {
     responseCode = "";
   }
@@ -41,8 +37,6 @@ export function verifyNombaSignature(
     timestamp,
   ].join(":");
 
-  // Off by default — set DEBUG_WEBHOOK_VERBOSE=true temporarily if signatures
-  // start mismatching and you need to see exactly what string was hashed.
   if (process.env.DEBUG_WEBHOOK_VERBOSE === "true") {
     console.log("Hashing payload:", hashingPayload);
   }

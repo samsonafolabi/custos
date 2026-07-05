@@ -1,21 +1,29 @@
 export interface NombaWebhookPayload {
   event_type: string;
   requestId: string;
+  fee?: number;
+  sessionId?: string;
   data: {
+    type?: string;
+    aliasAccountReference?: string;
+    aliasAccountType?: string;
     merchant: {
-      userId: string;
+      userId?: string;
       walletId: string;
-    };
-    transaction: {
       transactionId: string;
-      type: string;
-      time: string;
+      transactionAmount?: number;
+      walletBalance?: number;
+      aliasAccountName?: string;
+      accountNumber?: string;
+      narration?: string;
+      time?: string;
       responseCode?: string;
-      aliasAccountReference?: string; // the account_ref
-      transactionAmount?: number; // real field name; Nomba sends this as a number, not a string
     };
     customer?: {
       senderName?: string;
+      bankCode?: string;
+      bankName?: string;
+      accountNumber?: string;
     };
   };
 }
