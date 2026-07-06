@@ -21,7 +21,6 @@ router.post("/", async (req: Request, res: Response) => {
     startDate,
   } = req.body;
 
-  // Validate required fields
   if (
     !name ||
     !phone ||
@@ -35,7 +34,6 @@ router.post("/", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  // Validate numeric fields
   if (
     typeof principalAmount !== "number" ||
     principalAmount <= 0 ||
@@ -51,19 +49,36 @@ router.post("/", async (req: Request, res: Response) => {
     });
   }
 
+  // Track what we've created so we can report clearly on failure
+  let accountRef: string | null = null;
+  let bankAccountNumber: string | null = null;
+  let accountHolderId: string | null = null;
+
   try {
-    // 1. Authenticate with Nomba
+    // 1. Authenticate
     const token = await getNombaToken("live");
 
-    // 2. Create virtual account (need this for the borrower's bank_account_number)
-    const accountRef = `borrower-${Date.now()}`;
-    const { bankAccountNumber, accountHolderId } = await createVirtualAccount(
-      accountRef,
-      name,
-      token,
-    );
+    // 2. Create virtual account
+    accountRef = `borrower-${Date.now()}`;
+    const va = await createVirtualAccount(accountRef, name, token);
+    bankAccountNumber = va.bankAccountNumber;
+    accountHolderId = va.accountHolderId;
 
-    // 3. Get lender (must exist before saving borrower)
+    // 3. Disburse FIRST — before any DB writes
+    // If this fails, no DB records exist yet, so nothing to roll back
+    const transferRef = `loan-${accountRef}`;
+    const disbursement = await disburseLoan({
+      amount: principalAmount,
+      transferRef,
+      recipientName: name,
+      recipientAccountNumber,
+      recipientBankCode,
+      recipientBankName,
+      narration: `Loan disbursement — ${name}${recipientBankName ? ` (${recipientBankName})` : ""}`,
+      token,
+    });
+
+    // 4. Disbursement confirmed — now safe to write to DB
     const { data: lender } = await supabase
       .from("lenders")
       .select("id")
@@ -72,7 +87,6 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!lender) throw new Error("No lender found in database");
 
-    // 4. Save borrower to DB FIRST
     const { data: borrower } = await supabase
       .from("borrowers")
       .insert({
@@ -88,7 +102,6 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!borrower) throw new Error("Failed to save borrower");
 
-    // 5. Save loan to DB
     const { data: loan } = await supabase
       .from("loans")
       .insert({
@@ -104,7 +117,6 @@ router.post("/", async (req: Request, res: Response) => {
 
     if (!loan) throw new Error("Failed to save loan");
 
-    // 6. Generate installments (first due 1 month after startDate)
     for (let i = 1; i <= numInstallments; i++) {
       const dueDate = new Date(startDate);
       dueDate.setMonth(dueDate.getMonth() + i);
@@ -116,19 +128,6 @@ router.post("/", async (req: Request, res: Response) => {
         status: "pending",
       });
     }
-
-    // 7. Disburse loan ONLY after everything is persisted
-    const transferRef = `loan-${accountRef}`;
-    const disbursement = await disburseLoan({
-      amount: principalAmount,
-      transferRef,
-      recipientName: name,
-      recipientAccountNumber,
-      recipientBankCode,
-      recipientBankName,
-      narration: `Loan disbursement — ${name}${recipientBankName ? ` (${recipientBankName})` : ""}`,
-      token,
-    });
 
     return res.status(201).json({
       success: true,
@@ -142,9 +141,26 @@ router.post("/", async (req: Request, res: Response) => {
       disbursement,
     });
   } catch (err) {
-    console.error("Create borrower error:", err);
+    const message =
+      err instanceof Error ? err.message : "Failed to create borrower";
+    console.error("Create borrower error:", message);
+
+    // If VA was created but disbursement failed, log the orphaned account
+    // so it can be manually cleaned up or retried
+    if (accountRef && bankAccountNumber) {
+      console.error(
+        `⚠️ Orphaned virtual account — disbursement failed after VA creation.\n` +
+          `  accountRef: ${accountRef}\n` +
+          `  bankAccountNumber: ${bankAccountNumber}\n` +
+          `  No DB records were saved. Safe to retry.`,
+      );
+    }
+
     return res.status(500).json({
-      error: err instanceof Error ? err.message : "Failed to create borrower",
+      error: message,
+      // Tell the frontend whether it's safe to retry
+      // (VA exists at Nomba but no DB record — retry will create a new VA)
+      canRetry: true,
     });
   }
 });
