@@ -28,7 +28,7 @@ export async function handleNombaWebhook(payload: any) {
 
   // aliasAccountReference — try data level first, then transaction
   const accountRef =
-    payload.data?.aliasAccountReference ?? transaction?.aliasAccountReference;
+    transaction?.aliasAccountReference ?? payload.data?.aliasAccountReference;
 
   // transactionAmount — try merchant first, then transaction
   const rawAmount =
