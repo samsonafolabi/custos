@@ -7,6 +7,7 @@ import disputesRouter from "./routes/disputes";
 import agingRouter from "./routes/aging";
 import borrowersRouter from "./routes/borrowers";
 import webhookRouter from "./routes/webhook";
+import balanceRouter from "./routes/balance";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use("/api/portfolio", portfolioRouter);
 app.use("/api/disputes", disputesRouter);
 app.use("/api/aging", agingRouter);
 app.use("/api/borrowers", borrowersRouter);
+app.use("/api/balance", balanceRouter);
 app.use("/webhooks", webhookRouter);
 
 // ─── Start ───
