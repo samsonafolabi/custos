@@ -24,8 +24,6 @@ async function getNombaToken(): Promise<string> {
   });
 
   const data = await res.json();
-  console.log("Nomba auth response:", JSON.stringify(data, null, 2));
-
   if (data.code !== "00" || !data.data?.access_token) {
     throw new Error(
       "Auth failed: " + (data.description || JSON.stringify(data)),
@@ -48,9 +46,8 @@ router.get("/", async (req: Request, res: Response) => {
       },
     });
     const parentData = await parentRes.json();
-    console.log("Parent balance raw:", JSON.stringify(parentData, null, 2));
 
-    // Sub-account balance (collections)
+    // Sub-account balance
     const subRes = await fetch(
       `https://api.nomba.com/v1/accounts/${subAccountId}/balance`,
       {
@@ -61,26 +58,14 @@ router.get("/", async (req: Request, res: Response) => {
       },
     );
     const subData = await subRes.json();
-    console.log("Sub balance raw:", JSON.stringify(subData, null, 2));
 
-    // Extract balances safely
-    const parentBal =
-      parentData.data?.availableBalance ??
-      parentData.data?.ledgerBalance ??
-      parentData.availableBalance ??
-      parentData.ledgerBalance ??
-      0;
-    const subBal =
-      subData.data?.availableBalance ??
-      subData.data?.ledgerBalance ??
-      subData.availableBalance ??
-      subData.ledgerBalance ??
-      0;
+    // Nomba returns amount as string, parse it
+    const parentBal = parseFloat(parentData.data?.amount || "0");
+    const subBal = parseFloat(subData.data?.amount || "0");
 
     return res.json({
       parent: { availableBalance: parentBal },
       sub: { availableBalance: subBal },
-      raw: { parent: parentData, sub: subData },
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
