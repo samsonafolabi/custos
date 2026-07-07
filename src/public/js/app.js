@@ -3,3 +3,4 @@ loadDisputes();
 loadAging();
 loadBalance();
 loadDisbursements();
+loadCompleted();

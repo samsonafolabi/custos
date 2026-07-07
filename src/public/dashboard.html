@@ -97,6 +97,23 @@
             </svg>
             Disbursements
           </a>
+          <a onclick="showView('completed')" id="nav-completed">
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            Cleared
+          </a>
         </nav>
         <div class="profile-group">
           <div class="profile-chip" style="margin-right: 8px">
@@ -380,6 +397,62 @@
             </div>
           </div>
         </div>
+
+        <!-- CLEARED -->
+        <div class="view" id="view-completed">
+          <div class="page-header">
+            <div class="page-title">Cleared <span>Loans</span></div>
+            <div class="page-sub">
+              Fully paid loans and installments — closed books
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-label">Cleared Installments</div>
+                <div class="stat-dot">✓</div>
+              </div>
+              <div class="stat-value accent" id="stat-cleared-count">—</div>
+              <div class="stat-meta">individual payments</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-label">Value Cleared</div>
+                <div class="stat-dot">₦</div>
+              </div>
+              <div class="stat-value gold" id="stat-cleared-value">—</div>
+              <div class="stat-meta">total principal returned</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-label">Loans Cleared</div>
+                <div class="stat-dot">◈</div>
+              </div>
+              <div class="stat-value" id="stat-loans-cleared">—</div>
+              <div class="stat-meta">fully repaid</div>
+            </div>
+          </div>
+          <div class="table-card" style="margin-bottom: 20px">
+            <div class="table-header">
+              <span class="table-title">Paid Installments</span>
+              <span class="table-count" id="completed-count">Loading...</span>
+            </div>
+            <div id="completed-installments-wrap">
+              <div class="loading">Fetching cleared installments...</div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-title">Fully Cleared Loans</span>
+              <span class="table-count" id="completed-loans-count"
+                >Loading...</span
+              >
+            </div>
+            <div id="completed-loans-wrap">
+              <div class="loading">Fetching cleared loans...</div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -413,6 +486,7 @@
     <script src="/js/views/disputes.js"></script>
     <script src="/js/views/aging.js"></script>
     <script src="/js/views/disbursements.js"></script>
+    <script src="/js/views/completed.js"></script>
     <script src="/js/views/modal.js"></script>
     <script src="/js/app.js"></script>
   </body>
