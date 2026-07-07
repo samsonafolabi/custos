@@ -80,9 +80,27 @@
             </svg>
             Aging
           </a>
+          <a onclick="showView('disbursements')" id="nav-disbursements">
+            <svg
+              class="nav-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19l7-7 3 3-7 7-3-3z" />
+              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+              <path d="M2 2l7.586 7.586" />
+              <circle cx="11" cy="11" r="2" />
+            </svg>
+            Disbursements
+          </a>
         </nav>
         <div class="profile-group">
-          <!-- BALANCE CHIPS -->
           <div class="profile-chip" style="margin-right: 8px">
             <div
               class="profile-avatar"
@@ -327,6 +345,43 @@
             </div>
           </div>
         </div>
+
+        <!-- DISBURSEMENTS -->
+        <div class="view" id="view-disbursements">
+          <div class="page-header">
+            <div class="page-title">Disbursements <span>Log</span></div>
+            <div class="page-sub">All loans sent to borrowers</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-label">Total Disbursed</div>
+                <div class="stat-dot">↗</div>
+              </div>
+              <div class="stat-value accent" id="stat-total-disbursed">—</div>
+              <div class="stat-meta">capital outflow</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-top">
+                <div class="stat-label">Active Loans</div>
+                <div class="stat-dot">›</div>
+              </div>
+              <div class="stat-value" id="stat-active-loans-count">—</div>
+              <div class="stat-meta">currently running</div>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-header">
+              <span class="table-title">Disbursement History</span>
+              <span class="table-count" id="disbursements-count"
+                >Loading...</span
+              >
+            </div>
+            <div id="disbursements-table-wrap">
+              <div class="loading">Fetching disbursements...</div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -359,6 +414,7 @@
     <script src="/js/views/portfolio.js"></script>
     <script src="/js/views/disputes.js"></script>
     <script src="/js/views/aging.js"></script>
+    <script src="/js/views/disbursements.js"></script>
     <script src="/js/views/modal.js"></script>
     <script src="/js/app.js"></script>
   </body>
