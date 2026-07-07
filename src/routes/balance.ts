@@ -24,6 +24,8 @@ async function getNombaToken(): Promise<string> {
   });
 
   const data = await res.json();
+  console.log("Nomba auth response:", JSON.stringify(data, null, 2));
+
   if (data.code !== "00" || !data.data?.access_token) {
     throw new Error(
       "Auth failed: " + (data.description || JSON.stringify(data)),
@@ -46,6 +48,7 @@ router.get("/", async (req: Request, res: Response) => {
       },
     });
     const parentData = await parentRes.json();
+    console.log("Parent balance raw:", JSON.stringify(parentData, null, 2));
 
     // Sub-account balance (collections)
     const subRes = await fetch(
@@ -58,10 +61,26 @@ router.get("/", async (req: Request, res: Response) => {
       },
     );
     const subData = await subRes.json();
+    console.log("Sub balance raw:", JSON.stringify(subData, null, 2));
+
+    // Extract balances safely
+    const parentBal =
+      parentData.data?.availableBalance ??
+      parentData.data?.ledgerBalance ??
+      parentData.availableBalance ??
+      parentData.ledgerBalance ??
+      0;
+    const subBal =
+      subData.data?.availableBalance ??
+      subData.data?.ledgerBalance ??
+      subData.availableBalance ??
+      subData.ledgerBalance ??
+      0;
 
     return res.json({
-      parent: parentData.data || parentData,
-      sub: subData.data || subData,
+      parent: { availableBalance: parentBal },
+      sub: { availableBalance: subBal },
+      raw: { parent: parentData, sub: subData },
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
