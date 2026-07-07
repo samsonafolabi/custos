@@ -2,3 +2,4 @@
 loadBorrowers();
 loadDisputes();
 loadAging();
+loadBalance();

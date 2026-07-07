@@ -45,3 +45,22 @@ function showView(name) {
   document.getElementById("view-" + name).classList.add("active");
   document.getElementById("nav-" + name).classList.add("active");
 }
+
+async function loadBalance() {
+  try {
+    const res = await fetch("/api/balance");
+    const data = await res.json();
+
+    const parentBal =
+      data.parent?.availableBalance ?? data.parent?.ledgerBalance ?? 0;
+    const subBal = data.sub?.availableBalance ?? data.sub?.ledgerBalance ?? 0;
+
+    const parentEl = document.getElementById("balance-parent");
+    const subEl = document.getElementById("balance-sub");
+
+    if (parentEl) parentEl.textContent = naira(parentBal);
+    if (subEl) subEl.textContent = naira(subBal);
+  } catch (e) {
+    console.error("Balance load failed:", e);
+  }
+}
