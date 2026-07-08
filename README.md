@@ -9,6 +9,48 @@ Automated loan reconciliation for microfinance lenders in Nigeria.
 - **Handle edge cases** — overpayments stored as credit, underpayments flagged as disputes
 - **Full visibility** — portfolio, aging report, disputes queue, disbursements log, cleared loans
 
+## Reviewer Access
+
+No login required — the dashboard loads immediately with live data. Live URL has been provided in the submission form.
+
+### Test a Disbursement
+
+1. Click **"Add Borrower"** (top right of portfolio)
+2. Fill the form:
+   - **Full Name:** Any name (e.g., "Test User")
+   - **Phone:** Any Nigerian number (e.g., `+2348012345678`)
+   - **Loan Amount:** `240`
+   - **Monthly Repayment:** `40`
+   - **Number of Months:** `6`
+   - **First Repayment Date:** Any future date
+   - **Disbursement Bank:** Any bank (e.g., GTBank)
+   - **Account Number:** `0123456789`
+3. Click **"Review Loan →"**
+4. Review details, then **"Confirm & Disburse"**
+
+The system creates a virtual account for the borrower, attempts disbursement via the Nomba API, and shows a success screen with the repayment account number.
+
+**Note:** Disbursement uses the live Nomba API — use small amounts (120-600) from the disbursement pool. If the Nomba account balance is insufficient, disbursement fails gracefully with an error message.
+
+### What to Check After Disbursing
+
+| Page | What You'll See |
+|---|---|
+| Portfolio | New borrower listed with loan progress (e.g., "0/5 installments") |
+| Disbursements | Your test loan appears in the log |
+| Cleared | Updates here once installments are marked paid |
+
+### Live Balance
+
+Top-right of the dashboard shows:
+- **Pool** — Nomba parent account balance (available for lending)
+- **Inflow** — Sub-account balance (borrower repayments collected)
+
+### Reset Test Data
+
+To clear test borrowers and start fresh, contact us.
+
+
 ## Stack
 
 - Node.js + Express + TypeScript
@@ -82,10 +124,4 @@ webhook_events
 | `POST /v2/transfers/bank`                  | Disburse loan                 |
 | `POST /webhooks/nomba`                     | Receive payment notifications |
 
-## Demo Flow
 
-1. Click "Add Borrower" → fill form → review → confirm disbursement
-2. Borrower receives loan in their bank account
-3. Borrower repays to their unique virtual account
-4. Nomba sends webhook → payment auto-reconciled against installments
-5. Dashboard updates: portfolio, disputes (if underpaid), aging, cleared
