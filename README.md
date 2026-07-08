@@ -16,10 +16,6 @@ Automated loan reconciliation for microfinance lenders in Nigeria.
 - Nomba API (auth, virtual accounts, bank transfers, webhooks)
 - Vanilla JS frontend
 
-## Live Demo
-
-https://custos-production-cbc5.up.railway.app/dashboard
-
 ## Key Features
 
 | Feature                        | Status  |
