@@ -40,8 +40,6 @@ Custos automates the entire lending lifecycle using Nomba's banking infrastructu
 - Supabase Postgres with RLS-ready structure
 
 ## Live Links
-
-- **Dashboard:** https://custos-production-cbc5.up.railway.app/dashboard
 - **Repo:** https://github.com/samsonafolabi/custos
 
 ## Tech Stack
