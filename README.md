@@ -26,7 +26,6 @@ Automated loan reconciliation for microfinance lenders in Nigeria.
 
 The system creates a virtual account for the borrower, attempts disbursement via the Nomba API, and shows a success screen with the repayment account number.
 
-**Note:** Disbursement uses the live Nomba API — use small amounts (120-600) from the disbursement pool. If the Nomba account balance is insufficient, disbursement fails gracefully with an error message.
 
 ### What to Check After Disbursing
 
