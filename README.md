@@ -9,10 +9,6 @@ Automated loan reconciliation for microfinance lenders in Nigeria.
 - **Handle edge cases** — overpayments stored as credit, underpayments flagged as disputes
 - **Full visibility** — portfolio, aging report, disputes queue, disbursements log, cleared loans
 
-## Reviewer Access
-
-No login required — the dashboard loads immediately with live data. Live URL has been provided in the submission form.
-
 ### Test a Disbursement
 
 1. Click **"Add Borrower"** (top right of portfolio)
